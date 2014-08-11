@@ -4,6 +4,8 @@ use rustdoc::html::escape::Escape;
 
 use html::ToHtml;
 use html::Html;
+use blocks::Block;
+use blocks::FromBlock;
 
 #[deriving(Show)]
 pub struct Heading {
@@ -34,6 +36,15 @@ impl ToHtml for Heading {
     fn to_html(&self) -> Html {
         let name: String = format!("h{}", self.depth);
         Html::new_simple(name, self.contents.as_slice())
+    }
+}
+
+impl FromBlock for Heading {
+    fn from_block(block: Block) -> Option<Heading> {
+        if block.len() != 1 {
+            return None;
+        }
+        pound_heading(block[0].as_slice())
     }
 }
 

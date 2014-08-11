@@ -1,3 +1,6 @@
+use std::ops::Index;
+use std::slice::Items;
+
 #[deriving(Show)]
 pub struct Block {
     contents: Vec<String>,
@@ -15,14 +18,27 @@ impl Block {
             contents: vec![s],
         }
     }
-}
 
-impl<PartialEq> Block {
-    fn contains(&self, x: &String) -> bool {
-        self.contents.contains(x)
+    pub fn len(&self) -> uint {
+        self.contents.len()
     }
 
-    fn dedup(&mut self) {
-        self.contents.dedup()
+    #[inline]
+    pub fn iter<'a>(&'a self) -> Items<'a,String> {
+        self.as_slice().iter()
+    }
+}
+
+impl Index<uint, String> for Block {
+    fn index<'a>(&'a self, index: &uint) -> &'a String {
+        self.contents.get(*index)
+    }
+}
+
+
+impl Vector<String> for Block {
+    #[inline]
+    fn as_slice<'a>(&'a self) -> &'a [String] {
+        self.contents.as_slice()
     }
 }
