@@ -1,3 +1,17 @@
+pub struct Heading {
+    contents: String,
+    depth: uint,
+}
+
+impl Heading {
+    pub fn new(title: String, depth: uint) -> Heading {
+        Heading {
+            contents: title,
+            depth: uint,
+        }
+    }
+}
+
 fn pound_heading(s: &str) -> Option<String> {
     let mut result = None;
     if s.starts_with("#") {
@@ -21,13 +35,9 @@ fn pound_heading(s: &str) -> Option<String> {
     return result;
 }
 
-fn paragraph(s: &str) -> String {
-    "<p>".to_string() + s + "</p>".to_string()
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{pound_heading, paragraph};
+    use super::{pound_heading};
 
     #[test]
     fn test_pound_heads() {
@@ -41,11 +51,5 @@ mod tests {
     fn test_non_pound_heads() {
         assert_eq!(pound_heading("Hello, world"), None);
         assert_eq!(pound_heading(" ## Hello, world"), None);
-    }
-
-    #[test]
-    fn test_making_paragraphs() {
-        assert_eq!(paragraph("Hello, World"),
-                   "<p>Hello, World</p>".to_string());
     }
 }

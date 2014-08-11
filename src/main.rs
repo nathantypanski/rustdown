@@ -5,9 +5,10 @@ use std::os;
 use std::path::posix::Path;
 use getopts::OptGroup;
 
-mod convert;
-mod block;
+mod blocks;
 mod mdfile;
+mod html;
+mod types;
 
 fn print_usage(program: &str, opts: &[OptGroup]) {
     let summary = getopts::short_usage(program, opts);
@@ -62,7 +63,7 @@ fn main() {
             };
             match mdfile::open_markdown_file(&input_file) {
                 Ok(file) => {
-                    let blocks = block::blockify_file(file);
+                    let blocks = blocks::blockify_file(file);
                     println!("{}", blocks);
                 }
                 Err(e) => {
