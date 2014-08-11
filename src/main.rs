@@ -1,4 +1,4 @@
-
+extern crate rustdoc;
 extern crate getopts;
 
 use std::os;
