@@ -32,7 +32,6 @@ impl PartialEq for Heading {
 
 impl ToHtml for Heading {
     fn to_html(&self) -> Html {
-        let head = format!("<h{}>{}</h{}>", self.depth, self.contents, self.depth);
         let name: String = format!("h{}", self.depth);
         Html::new_simple(name, self.contents.as_slice())
     }
