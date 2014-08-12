@@ -73,7 +73,6 @@ fn main() {
             match mdfile::open_markdown_file(&input_file) {
                 Ok(file) => {
                     let blocks = blocks::blockify_file(file);
-                    println!("{}", blocks);
                     let markdown = convert::convert(blocks);
                     for md in markdown.iter() {
                         let html = md.to_html();

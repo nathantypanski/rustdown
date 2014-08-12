@@ -27,11 +27,11 @@ pub fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
 }
 
 pub fn all_same(c: char, s: &str) -> bool {
-    let c = c.to_string();
-    let ch = c.as_slice();
+    let cs = c.to_string();
+    let ch = cs.as_slice();
     if s.starts_with(ch) {
-        for badchar in s .as_slice().chars().filter_map(
-                    |c| if c == c { None } else { Some(c) }) {
+        for badchar in s.as_slice().chars().filter_map(
+                    |e| if e == c { None } else { Some(c) }) {
             return false;
         }
         return true;
@@ -43,6 +43,12 @@ pub fn all_same(c: char, s: &str) -> bool {
 mod tests {
     use super::starting_chars;
     use super::all_same;
+
+
+    #[test]
+    fn test_all_same() {
+        assert!(!all_same('-', "- This is a bullet"));
+    }
 
     #[test]
     fn test_starting_chars() {
