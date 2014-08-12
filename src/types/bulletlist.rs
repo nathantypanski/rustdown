@@ -2,9 +2,25 @@ use html::ToHtml;
 use html::Html;
 
 #[deriving(Eq, PartialEq, Clone)]
+pub enum BulletType {
+    Nested(BulletList),
+    Lone(Bullet),
+}
+
+impl BulletType {}
+
+impl ToHtml for BulletType {
+    fn to_html(&self) -> Html {
+        match self {
+            &Nested(ref bullet_list) => bullet_list.to_html(),
+            &Lone(ref bullet) => bullet.to_html(),
+        }
+    }
+}
+
+#[deriving(Eq, PartialEq, Clone)]
 pub struct Bullet {
     contents: String,
-    depth: uint,
 }
 
 /// A markdown bullet.
@@ -17,14 +33,6 @@ impl Bullet {
     pub fn new(contents: String) -> Bullet {
         Bullet {
             contents: contents,
-            depth: 0,
-        }
-    }
-
-    pub fn new_depth(contents: String, depth: uint) -> Bullet {
-        Bullet {
-            contents: contents,
-            depth: depth,
         }
     }
 }
@@ -46,7 +54,19 @@ impl ToHtml for Bullet {
 ///
 #[deriving(Eq, PartialEq, Clone)]
 pub struct BulletList {
-    contents: Vec<Bullet>,
+    contents: Vec<BulletType>,
+}
+
+impl BulletList {
+    fn new() -> BulletList {
+        BulletList {
+            contents: vec![],
+        }
+    }
+
+    fn push(&mut self, elem: BulletType) {
+        self.contents.push(elem);
+    }
 }
 
 impl ToHtml for BulletList {
@@ -63,7 +83,11 @@ impl ToHtml for BulletList {
 
 #[cfg(test)]
 mod tests {
+    use super::BulletType;
+    use super::Lone;
+    use super::Nested;
     use super::Bullet;
+    use super::BulletList;
     use html::ToHtml;
 
     #[test]
@@ -71,5 +95,14 @@ mod tests {
         let bullet = Bullet::new("Hello, world".to_string());
         assert_eq!(format!("{}", bullet.to_html()),
                    "<li>Hello, world</li>".to_string());
+    }
+
+    #[test]
+    fn test_nested_bullets() {
+        let mut bullets = BulletList::new();
+        bullets.push(Lone(Bullet::new("Hello".to_string())));
+        bullets.push(Lone(Bullet::new("World".to_string())));
+        assert_eq!(format!("{}", bullets.to_html()),
+                   "<ul><li>Hello</li><li>World</li></ul>".to_string());
     }
 }

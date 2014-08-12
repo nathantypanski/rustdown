@@ -97,16 +97,21 @@ impl fmt::Show for Html {
         }
         match self.contents {
             Bare(ref contents) => {
+                // Just a tag with contents
                 write!(fmt, ">");
                 write!(fmt, "{}", Escape(contents.as_slice()));
                 write!(fmt, "</{}>", name);
             }
             Tags(ref html) => {
+                // Multiple nested HTML elements.
+                write!(fmt, ">");
                 for elem in html.iter() {
                     write!(fmt, "{}", elem);
                 }
+                write!(fmt, "</{}>", name);
             }
             Empty => {
+                // Nothing! Close the tag.
                 write!(fmt, " />");
             }
         }
