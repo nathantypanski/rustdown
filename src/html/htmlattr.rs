@@ -1,6 +1,12 @@
 use rustdoc::html::escape::Escape;
 use std::fmt;
 
+/// A HTML attribute.
+///
+/// For example, in the HTML `<a href="http://example.com">Example</a>`,
+/// `href` would be the `name` of the `HtmlAttribute`, and
+/// `http://example.com` would be the `HtmlAttribute`'s contents.
+///
 #[deriving(Clone)]
 pub struct HtmlAttribute {
     name: String,

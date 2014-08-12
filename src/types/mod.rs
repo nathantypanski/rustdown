@@ -1,3 +1,4 @@
+pub use self::bulletlist::Bullet;
 pub use self::heading::Heading;
 pub use self::paragraph::Paragraph;
 pub use self::heading::parse_heading;
@@ -7,6 +8,7 @@ use html::ToHtml;
 
 mod heading;
 mod paragraph;
+mod bulletlist;
 
 #[deriving(Show)]
 pub enum MarkdownStructure {

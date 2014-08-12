@@ -4,6 +4,24 @@ use rustdoc::html::escape::Escape;
 
 use super::HtmlAttribute;
 
+/// The contents of an HTML tag.
+///
+/// Three possibilities exist:
+///
+/// 1. Nothing. This makes the tag close early, e.g., <br />.
+/// 2. A string. Provided for convenience.
+/// 3. A nested list of more HTML tags. The simplest example of this would
+///    be a nested set, like:
+///
+///    ```
+///    <ul>
+///        <li>Item1</li>
+///        <ul>
+///            <li>Indented item</li>
+///        </ul>
+///    </ul>
+///    ```
+///
 #[deriving(Clone)]
 pub enum HtmlContents {
     Bare(String),
@@ -11,6 +29,10 @@ pub enum HtmlContents {
     Empty,
 }
 
+/// An HTML tag.
+///
+/// These can have attributes, as well as nested contents.
+///
 #[deriving(Clone)]
 pub struct Html {
     name: String,
@@ -29,11 +51,35 @@ impl Html {
         }
     }
 
+    pub fn new_empty(name: String) -> Html {
+        Html {
+            name: name,
+            contents: Empty,
+            attributes: vec![],
+        }
+    }
+
     pub fn new_simple(name: String, contents: String) -> Html {
         Html {
             name: name,
             contents: Bare(contents),
             attributes: vec![],
+        }
+    }
+
+    pub fn add_tag(&mut self, tag: Html) -> Result<(), String> {
+        match self.contents {
+            Bare(_) => {
+                Err("This elment had strings already!".to_string())
+            },
+            Empty => {
+                self.contents = Tags(vec![tag]);
+                Ok(())
+            }
+            Tags(ref mut list) => {
+                list.push(tag);
+                Ok(())
+            }
         }
     }
 }
