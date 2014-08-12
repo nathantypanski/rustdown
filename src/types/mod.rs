@@ -7,7 +7,6 @@ pub use self::paragraph::parse_paragraph;
 use html::Html;
 use html::ToHtml;
 
-mod emph;
 mod inline;
 mod heading;
 mod paragraph;
