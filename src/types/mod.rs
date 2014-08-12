@@ -4,6 +4,7 @@ pub use self::heading::Heading;
 pub use self::paragraph::Paragraph;
 pub use self::heading::parse_heading;
 pub use self::paragraph::parse_paragraph;
+pub use self::bulletlist::parse_bulletlist;
 use html::Html;
 use html::ToHtml;
 

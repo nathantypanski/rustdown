@@ -25,8 +25,12 @@ pub fn parse_paragraph(block: &Block) -> Paragraph {
     Paragraph::new(
         block.iter().fold(
             "".to_string(),
-            |res, line| { res + "\n".to_string() + line.to_string() }
-        )
+            |res, line| {
+                res
+                    + "\n".to_string()
+                    + line.as_slice().to_string()
+            }
+        ).as_slice().trim().to_string()
     )
 }
 
@@ -43,5 +47,6 @@ mod tests {
     #[test]
     fn test_making_paragraphs() {
         paragraph_equals("Hello, World", "<p>Hello, World</p>");
+        paragraph_equals("Hello,\nWorld", "<p>Hello,\nWorld</p>");
     }
 }

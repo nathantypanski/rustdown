@@ -1,3 +1,4 @@
+use blocks::Block;
 use html::ToHtml;
 use html::Html;
 
@@ -93,6 +94,12 @@ impl BulletList {
     fn push(&mut self, elem: BulletElement) {
         self.contents.push(elem);
     }
+
+    /// Add a string bullet to this list, with depth same as
+    /// this list.
+    fn push_string(&mut self, s: String) {
+        self.push(Lone(Bullet::new(s)))
+    }
 }
 
 impl ToHtml for BulletList {
@@ -105,6 +112,56 @@ impl ToHtml for BulletList {
         }
         html
     }
+}
+
+pub fn parse_bulletlist(b: &Block) -> Option<BulletList> {
+    // TODO: Doesn't support nested lists!
+    let mut c: Option<&str> = None;
+    for s in b.iter() {
+        let st = s.as_slice().trim_left();
+        if st.len() < 1 { continue }
+        // TODO: This match is ugly.
+        match st.slice_chars(0, 1) {
+            "-" => {
+                match c {
+                    Some(bullet_letter) => {
+                        if bullet_letter != "-" {
+                            return None;
+                        }
+                    }
+                    None => {
+                        c = Some("-");
+                    }
+                }
+            }
+            "*" => {
+                match c {
+                    Some(bullet_letter) => {
+                        if bullet_letter != "*" {
+                            return None;
+                        }
+                    }
+                    None => {
+                        c = Some("*");
+                    }
+                }
+            }
+            _ => return None,
+        }
+    }
+    let mut bullets = BulletList::new_unordered();
+    for s in b.iter() {
+        // c is Some, or we would have returned by now.
+        match c {
+            Some(c) => bullets.push_string(s
+                                           .as_slice()
+                                           .slice_from(1u)
+                                           .trim_left()
+                                           .to_string()),
+            None => fail!("Unreachable pattern"),
+        }
+    }
+    Some(bullets)
 }
 
 #[cfg(test)]

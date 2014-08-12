@@ -4,12 +4,18 @@ use types::Heading;
 use types::MarkdownStructure;
 use types::MDH;
 use types::MDP;
+use types::MDB;
 use types::parse_heading;
 use types::parse_paragraph;
+use types::parse_bulletlist;
 
 pub fn parse_block(block: &Block) -> MarkdownStructure {
     match parse_heading(block) {
         Some(heading) => return MDH(heading),
+        None => {}
+    }
+    match parse_bulletlist(block) {
+        Some(bullets) => return MDB(bullets),
         None => {}
     }
     MDP(parse_paragraph(block))
