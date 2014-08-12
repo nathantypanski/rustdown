@@ -1,3 +1,7 @@
+#![feature(macro_rules)]
+#![feature(phase)]
+#![crate_id="rustdown#0.1"]
+
 extern crate rustdoc;
 extern crate getopts;
 
@@ -5,11 +9,15 @@ use std::os;
 use std::path::posix::Path;
 use getopts::OptGroup;
 
+use html::ToHtml;
+
 mod blocks;
 mod mdfile;
 mod html;
 mod types;
+mod convert;
 
+    
 fn print_usage(program: &str, opts: &[OptGroup]) {
     let summary = getopts::short_usage(program, opts);
     let usage = getopts::usage(summary.as_slice(), opts);
@@ -65,6 +73,11 @@ fn main() {
                 Ok(file) => {
                     let blocks = blocks::blockify_file(file);
                     println!("{}", blocks);
+                    let markdown = convert::convert(blocks);
+                    for md in markdown.iter() {
+                        let html = md.to_html();
+                        println!("{}", html);
+                    }
                 }
                 Err(e) => {
                     println!("Error opening markdown file:\n{}", e);

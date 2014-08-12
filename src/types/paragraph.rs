@@ -1,7 +1,6 @@
 use html::ToHtml;
 use html::Html;
 use blocks::Block;
-use blocks::FromBlock;
 
 #[deriving(Show)]
 pub struct Paragraph {
@@ -18,21 +17,17 @@ impl Paragraph {
 
 impl ToHtml for Paragraph {
     fn to_html(&self) -> Html {
-        Html::new_simple("p".to_string(), self.contents.as_slice())
+        Html::new_simple("p".to_string(), self.contents.clone())
     }
 }
 
-impl FromBlock for Paragraph {
-    fn from_block(block: Block) -> Option<Paragraph> {
-        Some(
-            Paragraph::new(
-                block.iter().fold(
-                    "".to_string(),
-                    |res, line| { res + "\n".to_string() + line.to_string() }
-                )
-            )
+pub fn parse_paragraph(block: &Block) -> Paragraph {
+    Paragraph::new(
+        block.iter().fold(
+            "".to_string(),
+            |res, line| { res + "\n".to_string() + line.to_string() }
         )
-    }
+    )
 }
 
 #[cfg(test)]

@@ -1,14 +1,15 @@
 use rustdoc::html::escape::Escape;
 use std::fmt;
 
-pub struct HtmlAttribute<'a> {
-    name: Escape<'a>,
-    contents: Escape<'a>,
+#[deriving(Clone)]
+pub struct HtmlAttribute {
+    name: String,
+    contents: String,
 }
 
-impl<'a> fmt::Show for HtmlAttribute<'a> {
+impl fmt::Show for HtmlAttribute {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        let format = format!("{}={}", self.name, self.contents);
-        fmt.write(format.into_bytes().as_slice())
+        write!(fmt, "{}={}", Escape(self.name.as_slice()),
+                             Escape(self.contents.as_slice()))
     }
 }

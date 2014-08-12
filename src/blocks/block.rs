@@ -35,7 +35,6 @@ impl Index<uint, String> for Block {
     }
 }
 
-
 impl Vector<String> for Block {
     #[inline]
     fn as_slice<'a>(&'a self) -> &'a [String] {

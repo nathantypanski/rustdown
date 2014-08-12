@@ -1,5 +1,6 @@
 use std::iter::FromIterator;
 use std::string::String;
+use std::slice::Items;
 
 use super::Block;
 
@@ -7,7 +8,30 @@ use super::Block;
 pub struct Blocks(Vec<Block>);
 
 impl Blocks {
+    pub fn len(&self) -> uint {
+        match self { &Blocks(ref blocks) => blocks.len() }
+    }
 
+    #[inline]
+    pub fn iter<'a>(&'a self) -> Items<'a,Block> {
+        match self { &Blocks(ref blocks) => blocks.as_slice().iter() }
+    }
+}
+
+impl Index<uint, Block> for Blocks {
+    fn index<'a>(&'a self, index: &uint) -> &'a Block {
+        let block = match self { &Blocks(ref blocks) => blocks.get(*index) };
+        block
+    }
+}
+
+
+impl Vector<Block> for Blocks {
+    #[inline]
+    fn as_slice<'a>(&'a self) -> &'a [Block] {
+        let blocks = match self { &Blocks(ref blocks) => blocks.as_slice() };
+        blocks
+    }
 }
 
 impl FromIterator<String> for Blocks {

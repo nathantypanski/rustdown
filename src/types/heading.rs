@@ -1,11 +1,12 @@
 use std::cmp::PartialEq;
 
-use rustdoc::html::escape::Escape;
-
 use html::ToHtml;
 use html::Html;
 use blocks::Block;
-use blocks::FromBlock;
+
+macro_rules! parse (
+    ($e:expr) => (match $e { Some(e) => return Some(e), None => () })
+)
 
 #[deriving(Show)]
 pub struct Heading {
@@ -35,21 +36,20 @@ impl PartialEq for Heading {
 impl ToHtml for Heading {
     fn to_html(&self) -> Html {
         let name: String = format!("h{}", self.depth);
-        Html::new_simple(name, self.contents.as_slice())
+        Html::new_simple(name, self.contents.clone())
     }
 }
 
-impl FromBlock for Heading {
-    fn from_block(block: Block) -> Option<Heading> {
-        if block.len() != 1 {
-            return None;
-        }
-        pound_heading(block[0].as_slice())
-    }
+pub fn parse_heading(block: &Block) -> Option<Heading> {
+    parse!(pound_heading(block));
+    parse!(line_heading(block));
+    None
 }
 
-fn pound_heading(s: &str) -> Option<Heading> {
+fn pound_heading(b: &Block) -> Option<Heading> {
+    if b.len() != 1 { return None }
     let mut result = None;
+    let s = b[0].as_slice();
     if s.starts_with("#") {
         let mut count = 0u;
         let title: String = s.chars().filter_map(
@@ -70,13 +70,21 @@ fn pound_heading(s: &str) -> Option<Heading> {
     return result;
 }
 
+fn line_heading(b: &Block) -> Option<Heading> {
+    if b.len() != 2 { return None }
+    let mut depth = 0u;
+    return None;
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Heading, pound_heading};
+    use blocks::Block;
     use html::ToHtml;
 
     fn pound_heading_equals(input: &str, result: &str) {
-        match pound_heading(input) {
+        let block = &Block::new_oneline(input.to_string());
+        match pound_heading(block) {
             Some(heading) => {
                 assert_eq!(format!("{}", heading.to_html()), result.to_string());
             }
@@ -86,13 +94,13 @@ mod tests {
 
     #[test]
     fn test_pound_heads() {
-        assert_eq!(pound_heading("# Hello, world"),
+        assert_eq!(pound_heading(&Block::new_oneline("# Hello, world".to_string())),
                    Some(Heading {
                        contents: "Hello, world".to_string(),
                        depth: 1,
                    })
                    );
-        assert_eq!(pound_heading("## Hello again, world!"),
+        assert_eq!(pound_heading(&Block::new_oneline("## Hello again, world!".to_string())),
                    Some(Heading {
                        contents: "Hello again, world!".to_string(),
                        depth: 2,
@@ -110,7 +118,7 @@ mod tests {
 
     #[test]
     fn test_non_pound_heads() {
-        assert_eq!(pound_heading("Hello, world"), None);
-        assert_eq!(pound_heading(" ## Hello, world"), None);
+        assert_eq!(pound_heading(&Block::new_oneline("Hello, world".to_string())), None);
+        assert_eq!(pound_heading(&Block::new_oneline(" ## Hello, world".to_string())), None);
     }
 }

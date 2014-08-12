@@ -4,16 +4,24 @@ use rustdoc::html::escape::Escape;
 
 use super::HtmlAttribute;
 
-pub struct Html<'a> {
-    name: String,
-    contents: Option<Escape<'a>>,
-    attributes: Vec<HtmlAttribute<'a>>,
+#[deriving(Clone)]
+pub enum HtmlContents {
+    Bare(String),
+    Tags(Vec<Html>),
+    Empty,
 }
 
-impl<'a> Html<'a> {
-    pub fn new<'a>(name: String,
-               contents: Option<Escape<'a>>,
-               attributes: Vec<HtmlAttribute<'a>>) -> Html<'a> {
+#[deriving(Clone)]
+pub struct Html {
+    name: String,
+    contents: HtmlContents,
+    attributes: Vec<HtmlAttribute>,
+}
+
+impl Html {
+    pub fn new(name: String,
+               contents: HtmlContents,
+               attributes: Vec<HtmlAttribute>) -> Html {
         Html {
             name: name,
             contents: contents,
@@ -21,10 +29,10 @@ impl<'a> Html<'a> {
         }
     }
 
-    pub fn new_simple<'a>(name: String, contents: &'a str) -> Html<'a> {
+    pub fn new_simple(name: String, contents: String) -> Html {
         Html {
             name: name,
-            contents: Some(Escape(contents)),
+            contents: Bare(contents),
             attributes: vec![],
         }
     }
@@ -34,21 +42,26 @@ pub trait ToHtml {
     fn to_html(&self) -> Html;
 }
 
-impl<'a> fmt::Show for Html<'a> {
+impl fmt::Show for Html {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         let name = Escape(self.name.as_slice());
-        try!(fmt.write(format!("<{}", name).into_bytes().as_slice()));
+        write!(fmt, "<{}", name);
         for attr in self.attributes.iter() {
-            try!(fmt.write(format!(" {}", attr).into_bytes().as_slice()));
+            write!(fmt, " {}", attr);
         }
         match self.contents {
-            Some(contents) => {
-                try!(fmt.write(format!(">").into_bytes().as_slice()));
-                try!(fmt.write(format!("{}", contents).into_bytes().as_slice()));
-                try!(fmt.write(format!("</{}>", name).into_bytes().as_slice()));
+            Bare(ref contents) => {
+                write!(fmt, ">");
+                write!(fmt, "{}", Escape(contents.as_slice()));
+                write!(fmt, "</{}>", name);
             }
-            None => {
-                try!(fmt.write(format!(" />").into_bytes().as_slice()));
+            Tags(ref html) => {
+                for elem in html.iter() {
+                    write!(fmt, "{}", elem);
+                }
+            }
+            Empty => {
+                write!(fmt, " />");
             }
         }
         Ok(())
