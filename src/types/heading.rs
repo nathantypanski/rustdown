@@ -46,28 +46,39 @@ pub fn parse_heading(block: &Block) -> Option<Heading> {
     None
 }
 
-fn pound_heading(b: &Block) -> Option<Heading> {
-    if b.len() != 1 { return None }
+/// If string `s` starts with `c`, then return the remaining characters
+/// after `c` has been trimmed from the beginning, along with the number
+/// of occurrences of `c` in the beginning of string `s`.
+fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
     let mut result = None;
-    let s = b[0].as_slice();
-    if s.starts_with("#") {
+    let cs = c.to_string();
+    let ch = cs.as_slice();
+    if s.starts_with(ch) {
         let mut count = 0u;
-        let title: String = s.chars().filter_map(
-            |c|
-            match c {
-                '#' => {
+        let words: String = s.chars().filter_map(
+            |letter|
+            match letter {
+                l if l == c => {
                     count += 1;
                     None
                 }
-                c => {
-                    Some(c)
+                other => {
+                    Some(other)
                 }
             }
         ).collect();
-        let title: &str = title.as_slice().trim_left_chars(' ');
-        result = Some(Heading::new(title.to_string(), count));
+        result = Some((words.as_slice().trim_left_chars(' ').to_string(), count));
     }
     return result;
+}
+
+fn pound_heading(b: &Block) -> Option<Heading> {
+    if b.len() != 1 { return None }
+    let s = b[0].as_slice();
+    match starting_chars(s, '#') {
+        Some((title, count)) => Some(Heading::new(title.to_string(), count)),
+        None => None,
+    }
 }
 
 fn line_heading(b: &Block) -> Option<Heading> {
