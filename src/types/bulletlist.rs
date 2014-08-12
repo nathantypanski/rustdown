@@ -1,15 +1,20 @@
 use html::ToHtml;
 use html::Html;
 
-#[deriving(Eq, PartialEq, Clone)]
-pub enum BulletType {
+/// An element in a bulleted list.
+///
+/// *Nested* means there's a sublist,
+/// while *Lone* means this is just a list item.
+///
+#[deriving(Eq, PartialEq, Clone, Show)]
+pub enum BulletElement {
     Nested(BulletList),
     Lone(Bullet),
 }
 
-impl BulletType {}
+impl BulletElement {}
 
-impl ToHtml for BulletType {
+impl ToHtml for BulletElement {
     fn to_html(&self) -> Html {
         match self {
             &Nested(ref bullet_list) => bullet_list.to_html(),
@@ -18,9 +23,17 @@ impl ToHtml for BulletType {
     }
 }
 
-#[deriving(Eq, PartialEq, Clone)]
+/// A list element.
+///
+/// *contents* is the contents of the list item.
+/// *tag* determines the tag to use for the bullet item.
+///
+/// The only valid tag for normal HTML would be `li`.
+///
+#[deriving(Eq, PartialEq, Clone, Show)]
 pub struct Bullet {
     contents: String,
+    tag: String,
 }
 
 /// A markdown bullet.
@@ -33,13 +46,14 @@ impl Bullet {
     pub fn new(contents: String) -> Bullet {
         Bullet {
             contents: contents,
+            tag: "li".to_string(),
         }
     }
 }
 
 impl ToHtml for Bullet {
     fn to_html(&self) -> Html {
-        let name: String = "li".to_string();
+        let name: String = self.tag.clone();
         Html::new_simple(name, self.contents.clone())
     }
 }
@@ -52,19 +66,31 @@ impl ToHtml for Bullet {
 /// - But this second bullet makes it a bulleted list.
 ///     - They can have somewhat arbitrary depth.
 ///
-#[deriving(Eq, PartialEq, Clone)]
+#[deriving(Eq, PartialEq, Clone, Show)]
 pub struct BulletList {
-    contents: Vec<BulletType>,
+    contents: Vec<BulletElement>,
+    tag: String,
 }
 
 impl BulletList {
-    fn new() -> BulletList {
+    /// Create a new empty ordered list (`ol` is the tag).
+    fn new_ordered() -> BulletList {
         BulletList {
             contents: vec![],
+            tag: "ol".to_string(),
         }
     }
 
-    fn push(&mut self, elem: BulletType) {
+    /// Create a new empty unordered list (`ul` is the tag).
+    fn new_unordered() -> BulletList {
+        BulletList {
+            contents: vec![],
+            tag: "ul".to_string(),
+        }
+    }
+
+    /// Add a `BulletElement` to this list.
+    fn push(&mut self, elem: BulletElement) {
         self.contents.push(elem);
     }
 }
@@ -83,7 +109,7 @@ impl ToHtml for BulletList {
 
 #[cfg(test)]
 mod tests {
-    use super::BulletType;
+    use super::BulletElement;
     use super::Lone;
     use super::Nested;
     use super::Bullet;
@@ -99,7 +125,7 @@ mod tests {
 
     #[test]
     fn test_nested_bullets() {
-        let mut bullets = BulletList::new();
+        let mut bullets = BulletList::new_unordered();
         bullets.push(Lone(Bullet::new("Hello".to_string())));
         bullets.push(Lone(Bullet::new("World".to_string())));
         assert_eq!(format!("{}", bullets.to_html()),

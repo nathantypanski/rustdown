@@ -71,14 +71,34 @@ fn pound_heading(b: &Block) -> Option<Heading> {
 }
 
 fn line_heading(b: &Block) -> Option<Heading> {
+    fn is_valid_line(c: char, s: &String) -> bool {
+        let c = c.to_string();
+        let ch = c.as_slice();
+        if (*s).as_slice().starts_with(ch) {
+            for badchar in s .as_slice().chars().filter_map(
+                        |c| if c == c { None } else { Some(c) }) {
+                return false;
+            }
+            return true;
+        }
+        false
+    }
     if b.len() != 2 { return None }
     let mut depth = 0u;
+    if is_valid_line('=', &b[1]) {
+        return Some(Heading::new(b[0].to_string(), 1));
+    }
+    if is_valid_line('-', &b[1]) {
+        return Some(Heading::new(b[0].to_string(), 2));
+    }
     return None;
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Heading, pound_heading};
+    use super::Heading;
+    use super::pound_heading;
+    use super::line_heading;
     use blocks::Block;
     use html::ToHtml;
 
@@ -105,6 +125,21 @@ mod tests {
                        contents: "Hello again, world!".to_string(),
                        depth: 2,
                    }));
+    }
+
+    fn test_line_heads() {
+        assert_eq!(line_heading(&Block::new_oneline("Hello\n=====".to_string())),
+                   Some(Heading {
+                       contents: "Hello".to_string(),
+                       depth: 1,
+                   }));
+        assert_eq!(line_heading(&Block::new_oneline("Hello\n-----".to_string())),
+                   Some(Heading {
+                       contents: "Hello".to_string(),
+                       depth: 2,
+                   }));
+        assert_eq!(line_heading(&Block::new_oneline("Hello\n =====".to_string())),
+                   None);
     }
 
     #[test]
