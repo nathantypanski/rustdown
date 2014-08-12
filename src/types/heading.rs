@@ -3,6 +3,7 @@ use std::cmp::PartialEq;
 use html::ToHtml;
 use html::Html;
 use blocks::Block;
+use generic;
 
 macro_rules! parse (
     ($e:expr) => (match $e { Some(e) => return Some(e), None => () })
@@ -46,60 +47,23 @@ pub fn parse_heading(block: &Block) -> Option<Heading> {
     None
 }
 
-/// If string `s` starts with `c`, then return the remaining characters
-/// after `c` has been trimmed from the beginning, along with the number
-/// of occurrences of `c` in the beginning of string `s`.
-fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
-    let mut result = None;
-    let cs = c.to_string();
-    let ch = cs.as_slice();
-    if s.starts_with(ch) {
-        let mut count = 0u;
-        let words: String = s.chars().filter_map(
-            |letter|
-            match letter {
-                l if l == c => {
-                    count += 1;
-                    None
-                }
-                other => {
-                    Some(other)
-                }
-            }
-        ).collect();
-        result = Some((words.as_slice().trim_left_chars(' ').to_string(), count));
-    }
-    return result;
-}
 
 fn pound_heading(b: &Block) -> Option<Heading> {
     if b.len() != 1 { return None }
     let s = b[0].as_slice();
-    match starting_chars(s, '#') {
+    match generic::starting_chars(s, '#') {
         Some((title, count)) => Some(Heading::new(title.to_string(), count)),
         None => None,
     }
 }
 
 fn line_heading(b: &Block) -> Option<Heading> {
-    fn is_valid_line(c: char, s: &String) -> bool {
-        let c = c.to_string();
-        let ch = c.as_slice();
-        if (*s).as_slice().starts_with(ch) {
-            for badchar in s .as_slice().chars().filter_map(
-                        |c| if c == c { None } else { Some(c) }) {
-                return false;
-            }
-            return true;
-        }
-        false
-    }
     if b.len() != 2 { return None }
     let mut depth = 0u;
-    if is_valid_line('=', &b[1]) {
+    if generic::all_same('=', b[1].as_slice()) {
         return Some(Heading::new(b[0].to_string(), 1));
     }
-    if is_valid_line('-', &b[1]) {
+    if generic::all_same('-', b[1].as_slice()) {
         return Some(Heading::new(b[0].to_string(), 2));
     }
     return None;

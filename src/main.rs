@@ -14,10 +14,11 @@ use html::ToHtml;
 mod blocks;
 mod mdfile;
 mod html;
+mod generic;
 mod types;
 mod convert;
 
-    
+
 fn print_usage(program: &str, opts: &[OptGroup]) {
     let summary = getopts::short_usage(program, opts);
     let usage = getopts::usage(summary.as_slice(), opts);
@@ -28,7 +29,7 @@ fn print_usage(program: &str, opts: &[OptGroup]) {
 // Print help if necessary, otherwise return Some(matches).
 fn opts() -> Option<getopts::Matches> {
     let args: Vec<String> = os::args();
-    
+
     let program = "rustdown";
 
     let opts = [
