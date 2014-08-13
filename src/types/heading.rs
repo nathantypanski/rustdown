@@ -9,6 +9,9 @@ macro_rules! parse (
     ($e:expr) => (match $e { Some(e) => return Some(e), None => () })
 )
 
+/// A markdown text heading. `depth` signifies the level of the heading, e.g.,
+/// `# head` is depth 1, `## head` is depth 2, and so on.
+///
 #[deriving(Show)]
 pub struct Heading {
     contents: String,
@@ -41,13 +44,19 @@ impl ToHtml for Heading {
     }
 }
 
+/// Parse all the different types of headings, regardless
+/// of how they're formatted. Return `Some(heading)` if one was found
+/// in this block.
 pub fn parse_heading(block: &Block) -> Option<Heading> {
     parse!(pound_heading(block));
     parse!(line_heading(block));
     None
 }
 
-
+/// A heading created with a pound sign, like:
+///
+///     # Heading
+///
 fn pound_heading(b: &Block) -> Option<Heading> {
     if b.len() != 1 { return None }
     let s = b[0].as_slice();
@@ -57,6 +66,11 @@ fn pound_heading(b: &Block) -> Option<Heading> {
     }
 }
 
+/// A heading created with an underline, like:
+///
+///     Heading
+///     =======
+///
 fn line_heading(b: &Block) -> Option<Heading> {
     if b.len() != 2 { return None }
     let mut depth = 0u;
