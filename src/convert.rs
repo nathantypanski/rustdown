@@ -8,7 +8,6 @@
 // except according to those terms.
 
 use blocks::Blocks;
-use blocks::Block;
 use types::Heading;
 use types::MarkdownStructure;
 use types::MDH;
@@ -18,7 +17,7 @@ use types::parse_heading;
 use types::parse_paragraph;
 use types::parse_bulletlist;
 
-pub fn parse_block(block: &Block) -> MarkdownStructure {
+pub fn parse_block(block: &Vec<String>) -> MarkdownStructure {
     match parse_heading(block) {
         Some(heading) => return MDH(heading),
         None => {}

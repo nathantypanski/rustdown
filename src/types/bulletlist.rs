@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use blocks::Block;
 use html::ToHtml;
 use html::Html;
 
@@ -123,9 +122,9 @@ impl ToHtml for BulletList {
     }
 }
 
-pub fn parse_bulletlist(b: &Block) -> Option<BulletList> {
+pub fn parse_bulletlist(b: &Vec<String>) -> Option<BulletList> {
     // TODO: Doesn't support nested lists!
-    let mut c: Option<&str> = None;
+    let mut c: &str = "";
     for s in b.iter() {
         let st = s.as_slice().trim_left();
         if st.len() < 1 { continue }
@@ -133,25 +132,25 @@ pub fn parse_bulletlist(b: &Block) -> Option<BulletList> {
         match st.slice_chars(0, 1) {
             "-" => {
                 match c {
-                    Some(bullet_letter) => {
+                    "" => {
+                        c = "-";
+                    }
+                    bullet_letter => {
                         if bullet_letter != "-" {
                             return None;
                         }
-                    }
-                    None => {
-                        c = Some("-");
                     }
                 }
             }
             "*" => {
                 match c {
-                    Some(bullet_letter) => {
+                    "" => {
+                        c = "*";
+                    }
+                    bullet_letter => {
                         if bullet_letter != "*" {
                             return None;
                         }
-                    }
-                    None => {
-                        c = Some("*");
                     }
                 }
             }
@@ -160,26 +159,18 @@ pub fn parse_bulletlist(b: &Block) -> Option<BulletList> {
     }
     let mut bullets = BulletList::new_unordered();
     for s in b.iter() {
-        // c is Some, or we would have returned by now.
-        match c {
-            Some(c) => bullets.push_string(s
-                                           .as_slice()
-                                           .slice_from(1u)
-                                           .trim_left()
-                                           .to_string()),
-            None => fail!("Unreachable pattern"),
-        }
+        bullets.push_string(s
+                            .as_slice()
+                            .slice_from(1u)
+                            .trim_left()
+                            .to_string());
     }
     Some(bullets)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::BulletElement;
-    use super::Lone;
-    use super::Nested;
-    use super::Bullet;
-    use super::BulletList;
+    use super::*;
     use html::ToHtml;
 
     #[test]
@@ -196,5 +187,15 @@ mod tests {
         bullets.push(Lone(Bullet::new("World".to_string())));
         assert_eq!(format!("{}", bullets.to_html()),
                    "<ul><li>Hello</li><li>World</li></ul>".to_string());
+    }
+
+    #[test]
+    fn test_parse_bullet_list() {
+        let s = vec!["- One".to_string(), "- Two".to_string()];
+        let parsed = parse_bulletlist(&s);
+        let mut bullets = BulletList::new_unordered();
+        bullets.push(Lone(Bullet::new("One".to_string())));
+        bullets.push(Lone(Bullet::new("Two".to_string())));
+        assert_eq!(parsed.unwrap(), bullets);
     }
 }

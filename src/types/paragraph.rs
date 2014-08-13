@@ -9,7 +9,6 @@
 
 use html::ToHtml;
 use html::Html;
-use blocks::Block;
 
 #[deriving(Show)]
 pub struct Paragraph {
@@ -30,7 +29,7 @@ impl ToHtml for Paragraph {
     }
 }
 
-pub fn parse_paragraph(block: &Block) -> Paragraph {
+pub fn parse_paragraph(block: &Vec<String>) -> Paragraph {
     Paragraph::new(
         block.iter().fold(
             "".to_string(),

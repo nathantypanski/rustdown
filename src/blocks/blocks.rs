@@ -11,10 +11,8 @@ use std::iter::FromIterator;
 use std::string::String;
 use std::slice::Items;
 
-use super::Block;
-
 #[deriving(Show)]
-pub struct Blocks(Vec<Block>);
+pub struct Blocks(Vec<Vec<String>>);
 
 impl Blocks {
     pub fn len(&self) -> uint {
@@ -22,22 +20,22 @@ impl Blocks {
     }
 
     #[inline]
-    pub fn iter<'a>(&'a self) -> Items<'a,Block> {
+    pub fn iter<'a>(&'a self) -> Items<'a,Vec<String>> {
         match self { &Blocks(ref blocks) => blocks.as_slice().iter() }
     }
 }
 
-impl Index<uint, Block> for Blocks {
-    fn index<'a>(&'a self, index: &uint) -> &'a Block {
+impl Index<uint, Vec<String>> for Blocks {
+    fn index<'a>(&'a self, index: &uint) -> &'a Vec<String> {
         let block = match self { &Blocks(ref blocks) => blocks.get(*index) };
         block
     }
 }
 
 
-impl Vector<Block> for Blocks {
+impl Vector<Vec<String>> for Blocks {
     #[inline]
-    fn as_slice<'a>(&'a self) -> &'a [Block] {
+    fn as_slice<'a>(&'a self) -> &'a [Vec<String>] {
         let blocks = match self { &Blocks(ref blocks) => blocks.as_slice() };
         blocks
     }
@@ -48,7 +46,7 @@ impl FromIterator<String> for Blocks {
         let mut blockbuf: Vec<String> = vec![];
         let mut blocks = iterator.fold(vec![], |mut vec, line| {
             if is_block_separator(line.as_slice()) {
-                vec.push(Block::new(blockbuf.clone()));
+                vec.push(blockbuf.clone());
                 blockbuf = vec![];
             }
             else {
@@ -56,7 +54,7 @@ impl FromIterator<String> for Blocks {
             }
             vec
         });
-        blocks.push(Block::new(blockbuf));
+        blocks.push(blockbuf);
         Blocks(blocks)
     }
 }

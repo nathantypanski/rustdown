@@ -9,6 +9,7 @@
 
 #![feature(macro_rules)]
 #![feature(phase)]
+#![feature(globs)]
 #![crate_id="rustdown#0.1"]
 
 extern crate rustdoc;

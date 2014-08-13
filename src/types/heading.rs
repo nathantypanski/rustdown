@@ -11,7 +11,6 @@ use std::cmp::PartialEq;
 
 use html::ToHtml;
 use html::Html;
-use blocks::Block;
 use generic;
 
 macro_rules! parse (
@@ -56,7 +55,7 @@ impl ToHtml for Heading {
 /// Parse all the different types of headings, regardless
 /// of how they're formatted. Return `Some(heading)` if one was found
 /// in this block.
-pub fn parse_heading(block: &Block) -> Option<Heading> {
+pub fn parse_heading(block: &Vec<String>) -> Option<Heading> {
     parse!(pound_heading(block));
     parse!(line_heading(block));
     None
@@ -66,7 +65,7 @@ pub fn parse_heading(block: &Block) -> Option<Heading> {
 ///
 ///     # Heading
 ///
-fn pound_heading(b: &Block) -> Option<Heading> {
+fn pound_heading(b: &Vec<String>) -> Option<Heading> {
     if b.len() != 1 { return None }
     let s = b[0].as_slice();
     match generic::starting_chars(s, '#') {
@@ -80,7 +79,7 @@ fn pound_heading(b: &Block) -> Option<Heading> {
 ///     Heading
 ///     =======
 ///
-fn line_heading(b: &Block) -> Option<Heading> {
+fn line_heading(b: &Vec<String>) -> Option<Heading> {
     if b.len() != 2 { return None }
     let mut depth = 0u;
     if generic::all_chars_are('=', b[1].as_slice()) {
@@ -97,11 +96,10 @@ mod tests {
     use super::Heading;
     use super::pound_heading;
     use super::line_heading;
-    use blocks::Block;
     use html::ToHtml;
 
     fn pound_heading_equals(input: &str, result: &str) {
-        let block = &Block::new_oneline(input.to_string());
+        let block = &vec![input.to_string()];
         match pound_heading(block) {
             Some(heading) => {
                 assert_eq!(format!("{}", heading.to_html()), result.to_string());
@@ -112,13 +110,13 @@ mod tests {
 
     #[test]
     fn test_pound_heads() {
-        assert_eq!(pound_heading(&Block::new_oneline("# Hello, world".to_string())),
+        assert_eq!(pound_heading(&vec!["# Hello, world".to_string()]),
                    Some(Heading {
                        contents: "Hello, world".to_string(),
                        depth: 1,
                    })
                    );
-        assert_eq!(pound_heading(&Block::new_oneline("## Hello again, world!".to_string())),
+        assert_eq!(pound_heading(&vec!("## Hello again, world!".to_string())),
                    Some(Heading {
                        contents: "Hello again, world!".to_string(),
                        depth: 2,
@@ -126,17 +124,17 @@ mod tests {
     }
 
     fn test_line_heads() {
-        assert_eq!(line_heading(&Block::new_oneline("Hello\n=====".to_string())),
+        assert_eq!(line_heading(&vec!("Hello\n=====".to_string())),
                    Some(Heading {
                        contents: "Hello".to_string(),
                        depth: 1,
                    }));
-        assert_eq!(line_heading(&Block::new_oneline("Hello\n-----".to_string())),
+        assert_eq!(line_heading(&vec!("Hello\n-----".to_string())),
                    Some(Heading {
                        contents: "Hello".to_string(),
                        depth: 2,
                    }));
-        assert_eq!(line_heading(&Block::new_oneline("Hello\n =====".to_string())),
+        assert_eq!(line_heading(&vec!("Hello\n =====".to_string())),
                    None);
     }
 
@@ -151,7 +149,7 @@ mod tests {
 
     #[test]
     fn test_non_pound_heads() {
-        assert_eq!(pound_heading(&Block::new_oneline("Hello, world".to_string())), None);
-        assert_eq!(pound_heading(&Block::new_oneline(" ## Hello, world".to_string())), None);
+        assert_eq!(pound_heading(&vec!("Hello, world".to_string())), None);
+        assert_eq!(pound_heading(&vec!(" ## Hello, world".to_string())), None);
     }
 }

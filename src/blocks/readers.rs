@@ -11,7 +11,6 @@ use std::io::fs::File;
 use std::io::BufferedReader;
 use std::iter::FromIterator;
 
-use super::Block;
 use super::blocks::Blocks;
 
 pub fn blockify_file(file: File) -> Blocks {
