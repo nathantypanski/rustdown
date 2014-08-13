@@ -1,3 +1,12 @@
+// Copyright 2014 The Rustdown Developers. See the COPYRIGHT
+// file at the top-level directory of this distribution.
+//
+// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
+
 /// If string `s` starts with `c`, then return the remaining characters
 /// after `c` has been trimmed from the beginning, along with the number
 /// of occurrences of `c` in the beginning of string `s`.
