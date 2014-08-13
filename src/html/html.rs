@@ -1,4 +1,6 @@
 use std::fmt;
+use std::slice::Items;
+use std::iter::Iterator;
 
 use rustdoc::html::escape::Escape;
 
@@ -8,25 +10,26 @@ use super::HtmlAttribute;
 ///
 #[deriving(Clone)]
 pub enum HtmlContents {
-/// Just a string, provided for convenience.
-///
+    /// Just a string. For example, in
+    ///
+    ///    <p>Hi <a href="http://example.com>there</a></p>
+    ///
+    /// The contents of the `<p>` are a `Bare` (string) and then a `Tag`.
+    ///
     Bare(String),
-/// A nested list of more HTML tags. A simple example of this would
-/// be a nested set, like:
-///
-///    ```
-///    <ul>
-///        <li>Item1</li>
-///        <ul>
-///            <li>Indented item</li>
-///        </ul>
-///    </ul>
-///    ```
-///
-    Tags(Vec<Html>),
-/// Nothing. This also makes the tag close early, e.g., <br />.
-///
-    Empty,
+    /// A nested list of more HTML tags. A simple example of this would
+    /// be a nested set, like:
+    ///
+    ///    ```
+    ///    <ul>
+    ///        <li>Item1</li>
+    ///        <ul>
+    ///            <li>Indented item</li>
+    ///        </ul>
+    ///    </ul>
+    ///    ```
+    ///
+    Tag(Html),
 }
 
 /// An HTML tag.
@@ -36,7 +39,7 @@ pub enum HtmlContents {
 #[deriving(Clone)]
 pub struct Html {
     name: String,
-    contents: HtmlContents,
+    contents: Option<Vec<HtmlContents>>,
     attributes: Vec<HtmlAttribute>,
 }
 
@@ -45,7 +48,7 @@ impl Html {
     /// and attributes.
     ///
     pub fn new(name: String,
-               contents: HtmlContents,
+               contents: Option<Vec<HtmlContents>>,
                attributes: Vec<HtmlAttribute>) -> Html {
         Html {
             name: name,
@@ -60,7 +63,7 @@ impl Html {
     pub fn new_empty(name: String) -> Html {
         Html {
             name: name,
-            contents: Empty,
+            contents: None,
             attributes: vec![],
         }
     }
@@ -70,46 +73,41 @@ impl Html {
     pub fn new_simple(name: String, contents: String) -> Html {
         Html {
             name: name,
-            contents: Bare(contents),
+            contents: Some(vec![Bare(contents)]),
             attributes: vec![],
         }
     }
 
-    /// Add a new `Html` element to this HTML tag. This assumes the `contents`
-    /// of this tag are either `Tags` or `Empty`, and will return an `Err` if
-    /// that is not the case.
+    /// Add a new `Html` element to this HTML tag.
     ///
-    pub fn add_tag(&mut self, tag: Html) -> Result<(), String> {
+    pub fn add_tag(&mut self, tag: Html) {
         match self.contents {
-            Bare(_) => {
-                Err("This elment had strings already!".to_string())
+            Some(ref mut contents) => {
+                contents.push(Tag(tag));
             },
-            Empty => {
-                self.contents = Tags(vec![tag]);
-                Ok(())
-            }
-            Tags(ref mut list) => {
-                list.push(tag);
-                Ok(())
+            None => {
+                self.contents = Some(vec![Tag(tag)]);
             }
         }
     }
 
-    /// Add a `String` to this HTML tag. This assumes the `contents` of this tag are
-    /// `Empty`, and will return an `Err` if that is not the case.
+    /// Add a `String` to this HTML tag.
     ///
-    pub fn add_string(&mut self, s: String) -> Result<(), String> {
+    pub fn add_string(&mut self, s: String) {
         match self.contents {
-            Bare(_) => {
-                Err("This elment had strings already!".to_string())
+            Some(ref mut contents) => {
+                contents.push(Bare(s));
             },
-            Empty => {
-                self.contents = Bare(s);
-                Ok(())
+            None => {
+                self.contents = Some(vec![Bare(s)]);
             }
-            Tags(ref mut list) => {
-                Err("This elment has tags!".to_string())
-            }
+        }
+    }
+
+    pub fn slice_contents<'a>(&'a self) -> Option<&'a [HtmlContents]> {
+        match self.contents {
+            Some(ref contents) => Some(contents.as_slice()),
+            None => None,
         }
     }
 }
@@ -125,22 +123,23 @@ impl fmt::Show for Html {
         for attr in self.attributes.iter() {
             write!(fmt, " {}", attr);
         }
-        match self.contents {
-            Bare(ref contents) => {
-                // Just a tag with contents
+        match self.slice_contents() {
+            Some(contents) => {
                 write!(fmt, ">");
-                write!(fmt, "{}", Escape(contents.as_slice()));
+                for elem in contents.iter() {
+                    match elem {
+                        &Tag(ref html) => {
+                            // Multiple nested HTML elements.
+                            write!(fmt, "{}", html);
+                        }
+                        &Bare(ref s) => {
+                            write!(fmt, "{}", Escape(s.as_slice()));
+                        }
+                    }
+                };
                 write!(fmt, "</{}>", name);
             }
-            Tags(ref html) => {
-                // Multiple nested HTML elements.
-                write!(fmt, ">");
-                for elem in html.iter() {
-                    write!(fmt, "{}", elem);
-                }
-                write!(fmt, "</{}>", name);
-            }
-            Empty => {
+            None => {
                 // Nothing! Close the tag.
                 write!(fmt, " />");
             }

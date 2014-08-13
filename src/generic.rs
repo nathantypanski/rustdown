@@ -26,7 +26,7 @@ pub fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
     return result;
 }
 
-pub fn all_same(c: char, s: &str) -> bool {
+pub fn all_chars_are(c: char, s: &str) -> bool {
     let cs = c.to_string();
     let ch = cs.as_slice();
     if s.starts_with(ch) {
@@ -42,12 +42,21 @@ pub fn all_same(c: char, s: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::starting_chars;
-    use super::all_same;
-
+    use super::all_chars_are;
 
     #[test]
-    fn test_all_same() {
-        assert!(!all_same('-', "- This is a bullet"));
+    fn test_all_chars_are_fail() {
+        assert!(!all_chars_are('-', "- This is a bullet"));
+        assert!(!all_chars_are('-', ""));
+        assert!(!all_chars_are('a', "aaaba"));
+        assert!(!all_chars_are('a', "aaab"));
+        assert!(!all_chars_are('a', "baaa"));
+    }
+
+    #[test]
+    fn test_all_chars_are_pass() {
+        assert!(all_chars_are('-', "------------"));
+        assert!(all_chars_are('=', "="));
     }
 
     #[test]

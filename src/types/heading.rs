@@ -60,10 +60,10 @@ fn pound_heading(b: &Block) -> Option<Heading> {
 fn line_heading(b: &Block) -> Option<Heading> {
     if b.len() != 2 { return None }
     let mut depth = 0u;
-    if generic::all_same('=', b[1].as_slice()) {
+    if generic::all_chars_are('=', b[1].as_slice()) {
         return Some(Heading::new(b[0].to_string(), 1));
     }
-    if generic::all_same('-', b[1].as_slice()) {
+    if generic::all_chars_are('-', b[1].as_slice()) {
         return Some(Heading::new(b[0].to_string(), 2));
     }
     return None;
