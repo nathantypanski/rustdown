@@ -118,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn test_heads_fmt() {
+    fn test_pound_heads_fmt() {
         pound_heading_equals("# Hello, world", "<h1>Hello, world</h1>");
         pound_heading_equals("## Hello again, world!",
                              "<h2>Hello again, world!</h2>");
