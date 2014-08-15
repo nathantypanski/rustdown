@@ -1,5 +1,4 @@
-Rustdown
-========
+# Rustdown [![Build Status](https://travis-ci.org/nathantypanski/rustdown.svg)](https://travis-ci.org/nathantypanski/rustdown)
 
 Rustdown is a [Markdown](http://daringfireball.net/projects/markdown/) processor written in Rust. It's still fairly work-in-progress right now. The goal is for it to take input Markdown files and emit HTML documents.
 
