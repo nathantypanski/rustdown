@@ -10,6 +10,7 @@
 #![feature(macro_rules)]
 #![feature(phase)]
 #![feature(globs)]
+#![feature(import_shadowing)]
 #![crate_id="rustdown#0.1"]
 
 extern crate rustdoc;
