@@ -10,6 +10,7 @@
 use std::iter::FromIterator;
 use std::string::String;
 use std::slice::Items;
+use std::slice::Slice;
 
 #[deriving(Show)]
 pub struct Blocks(Vec<Vec<String>>);
@@ -33,7 +34,7 @@ impl Index<uint, Vec<String>> for Blocks {
 }
 
 
-impl Vector<Vec<String>> for Blocks {
+impl Slice<Vec<String>> for Blocks {
     #[inline]
     fn as_slice<'a>(&'a self) -> &'a [Vec<String>] {
         let blocks = match self { &Blocks(ref blocks) => blocks.as_slice() };
