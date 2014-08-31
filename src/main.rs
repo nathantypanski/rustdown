@@ -76,7 +76,7 @@ fn opts() -> Option<getopts::Matches> {
 fn main() {
     match opts() {
         Some(matches) => {
-            let input = matches.opt_str("i").expect("-i argument is required!");
+            let input = matches.opt_str("i").expect("Some input argument is required!");
             let input_file = match Path::new_opt(input) {
                 Some(file) => file,
                 None => return,
