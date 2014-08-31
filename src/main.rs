@@ -25,7 +25,7 @@ use html::ToHtml;
 mod blocks;
 mod mdfile;
 mod html;
-mod generic;
+mod text;
 mod types;
 mod convert;
 

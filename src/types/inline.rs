@@ -11,10 +11,22 @@ enum Contents {
     Italic(String, Box<Contents>),
     Bold(String, Box<Contents>),
     Code(String, Box<Contents>),
-    Normal(String),
+    Normal(String, Box<Contents>),
     Nil
 }
 
-struct InlineContents {
-    contents: Vec<String>,
+impl Contents {
+    fn new(s: String) -> Contents {
+        Normal(s, box Nil)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test() {
+
+    }
 }

@@ -11,7 +11,7 @@ use std::cmp::PartialEq;
 
 use html::ToHtml;
 use html::Html;
-use generic;
+use text;
 
 macro_rules! parse (
     ($e:expr) => (match $e { Some(e) => return Some(e), None => () })
@@ -68,7 +68,7 @@ pub fn parse_heading(block: &Vec<String>) -> Option<Heading> {
 fn pound_heading(b: &Vec<String>) -> Option<Heading> {
     if b.len() != 1 { return None }
     let s = b[0].as_slice();
-    match generic::starting_chars(s, '#') {
+    match text::starting_chars(s, '#') {
         Some((title, count)) => Some(Heading::new(title.to_string(), count)),
         None => None,
     }
@@ -82,10 +82,10 @@ fn pound_heading(b: &Vec<String>) -> Option<Heading> {
 fn line_heading(b: &Vec<String>) -> Option<Heading> {
     if b.len() != 2 { return None }
     let mut depth = 0u;
-    if generic::all_chars_are('=', b[1].as_slice()) {
+    if text::all_chars_are('=', b[1].as_slice()) {
         return Some(Heading::new(b[0].to_string(), 1));
     }
-    if generic::all_chars_are('-', b[1].as_slice()) {
+    if text::all_chars_are('-', b[1].as_slice()) {
         return Some(Heading::new(b[0].to_string(), 2));
     }
     return None;
