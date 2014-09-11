@@ -7,11 +7,14 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use url::Url;
+
 enum Contents {
     Italic(String, Box<Contents>),
     Bold(String, Box<Contents>),
     Code(String, Box<Contents>),
     Normal(String, Box<Contents>),
+    Link(String, Url, Box<Contents>),
     Nil
 }
 
