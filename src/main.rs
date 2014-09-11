@@ -56,6 +56,9 @@ fn opts() -> Option<getopts::Matches> {
                      "OUTPUT",
                      getopts::Yes,
                      getopts::Optional),
+        getopts::optflag("p",
+                         "preview",
+                         "preview the output in a web browser"),
         getopts::optflag("h", "help", "print this help menu")
     ];
     let matches = match getopts::getopts(args.tail(), opts) {
