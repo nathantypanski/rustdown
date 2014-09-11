@@ -7,26 +7,29 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+use std::str::CharEq;
+use std::fmt::Show;
+
+
 /// If string `s` starts with `c`, then return the remaining characters
 /// after `c` has been trimmed from the beginning, along with the number
 /// of occurrences of `c` in the beginning of string `s`.
 pub fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
     let mut result = None;
-    let cs = c.to_string();
-    let ch = cs.as_slice();
-    if s.starts_with(ch) {
+    if s.trim_chars(c) != s {
         let mut count = 0u;
         let mut found = false;
         let words: String = s.chars().filter_map(
-            |letter|
-            match letter {
-                l if l == c && !found => {
-                    count += 1;
-                    None
-                }
-                other => {
-                    found = true;
-                    Some(other)
+            |letter| {
+                match letter {
+                    l if c == letter && !found => {
+                        count += 1;
+                        None
+                    }
+                    other => {
+                        found = true;
+                        Some(other)
+                    }
                 }
             }
         ).collect();

@@ -9,6 +9,7 @@
 
 use html::ToHtml;
 use html::Html;
+use text;
 
 /// An element in a bulleted list.
 ///
@@ -107,6 +108,18 @@ impl BulletList {
     /// this list.
     fn push_string(&mut self, s: String) {
         self.push(Lone(Bullet::new(s)))
+    }
+
+    fn is_numeric_bullet<'a>(s: String) -> Option<(String, uint)> {
+        text::starting_chars(s.as_slice(), ' ')
+        .and_then(|(s, i)| {
+            if i % 4 == 0 {
+                Some((s, i))
+            }
+            else {
+                None
+            }
+        })
     }
 }
 
