@@ -71,9 +71,14 @@ mod tests {
 
     #[test]
     fn test_determining_block_separators() {
+        // Block separators
         assert!(is_block_separator(""));
         assert!(is_block_separator("    "));
         assert!(is_block_separator("\t"));
+        // Not block separators
         assert!(!is_block_separator(" ## t"));
+        assert!(!is_block_separator("A line with text"));
+        assert!(!is_block_separator("- a bullet"));
+        assert!(!is_block_separator("1. A numeric bullet"));
     }
 }
