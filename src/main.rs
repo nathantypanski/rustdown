@@ -11,13 +11,14 @@
 #![feature(phase)]
 #![feature(globs)]
 #![feature(import_shadowing)]
-#![crate_id="rustdown#0.1"]
 
 extern crate rustdoc;
 extern crate getopts;
+extern crate url;
 
 use std::os;
 use std::path::posix::Path;
+use std::io::fs::File;
 use getopts::OptGroup;
 
 use html::ToHtml;
@@ -76,6 +77,17 @@ fn opts() -> Option<getopts::Matches> {
     return Some(matches);
 }
 
+fn read_markdown_file(file: File) {
+    let blocks = blocks::blockify_file(file);
+    let markdown = convert::convert(blocks);
+    for md in markdown.iter() {
+        let html = md.to_html();
+        println!("{}", html);
+    }
+}
+
+
+
 fn main() {
     match opts() {
         Some(matches) => {
@@ -86,12 +98,7 @@ fn main() {
             };
             match mdfile::open_markdown_file(&input_file) {
                 Ok(file) => {
-                    let blocks = blocks::blockify_file(file);
-                    let markdown = convert::convert(blocks);
-                    for md in markdown.iter() {
-                        let html = md.to_html();
-                        println!("{}", html);
-                    }
+                    read_markdown_file(file);
                 }
                 Err(e) => {
                     println!("Error opening markdown file:\n{}", e);
