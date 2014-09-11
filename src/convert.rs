@@ -7,7 +7,6 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use blocks::Blocks;
 use types::MarkdownStructure;
 use types::MDH;
 use types::MDP;
@@ -26,12 +25,4 @@ pub fn parse_block(block: &Vec<String>) -> MarkdownStructure {
         None => {}
     }
     MDP(parse_paragraph(block))
-}
-
-pub fn convert(blocks: Blocks) -> Vec<MarkdownStructure> {
-    let mut markdown: Vec<MarkdownStructure> = vec![];
-    for block in blocks.iter() {
-        markdown.push(parse_block(block))
-    }
-    markdown
 }

@@ -23,8 +23,9 @@ use getopts::OptGroup;
 
 use html::ToHtml;
 
-mod blocks;
+mod lines;
 mod mdfile;
+mod preprocessor;
 mod html;
 mod text;
 mod types;
@@ -78,12 +79,10 @@ fn opts() -> Option<getopts::Matches> {
 }
 
 fn read_markdown_file(file: File) {
-    let blocks = blocks::blockify_file(file);
-    let markdown = convert::convert(blocks);
-    for md in markdown.iter() {
-        let html = md.to_html();
-        println!("{}", html);
-    }
+    let blocks = lines::split_file_lines(file);
+    let markdown = convert::parse_block(&blocks);
+    let html = markdown.to_html();
+    println!("{}", html);
 }
 
 
