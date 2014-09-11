@@ -8,7 +8,6 @@
 // except according to those terms.
 
 use blocks::Blocks;
-use types::Heading;
 use types::MarkdownStructure;
 use types::MDH;
 use types::MDP;
