@@ -21,15 +21,13 @@ pub fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
         let mut found = false;
         let words: String = s.chars().filter_map(
             |letter| {
-                match letter {
-                    l if c == letter && !found => {
-                        count += 1;
-                        None
-                    }
-                    other => {
-                        found = true;
-                        Some(other)
-                    }
+                if c == letter && !found {
+                    count += 1;
+                    None
+                }
+                else {
+                    found = true;
+                    Some(letter)
                 }
             }
         ).collect();
