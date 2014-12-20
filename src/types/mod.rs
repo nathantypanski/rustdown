@@ -17,10 +17,10 @@ pub use self::bulletlist::parse_bulletlist;
 use html::Html;
 use html::ToHtml;
 
-mod inline;
-mod heading;
-mod paragraph;
-mod bulletlist;
+pub mod inline;
+pub mod heading;
+pub mod paragraph;
+pub mod bulletlist;
 
 #[deriving(Show)]
 pub enum MarkdownStructure {

@@ -16,14 +16,4 @@ pub fn replace_tabs(lines: &Vec<String>) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn assert_string(vx: Vec<str>, vy: Vec<str>) {
-        assert_eq!(vx.iter().map(|x| (*x).to_string()).collect(),
-                   vy.iter().map(|x| (*x).to_string()).collect())
-    }
-
-    #[test]
-    fn test_replace_tabs() {
-        assert_string(replace_tabs(&vec!("Hi")), "Hi");
-    }
 }

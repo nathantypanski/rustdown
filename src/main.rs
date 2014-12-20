@@ -23,13 +23,13 @@ use getopts::OptGroup;
 
 use html::ToHtml;
 
-mod lines;
-mod mdfile;
-mod preprocessor;
-mod html;
-mod text;
-mod types;
-mod convert;
+pub mod lines;
+pub mod mdfile;
+pub mod preprocessor;
+pub mod html;
+pub mod text;
+pub mod types;
+pub mod convert;
 
 
 fn print_usage(program: &str, opts: &[OptGroup]) {
@@ -45,7 +45,7 @@ fn opts() -> Option<getopts::Matches> {
 
     let program = "rustdown";
 
-    let opts = [
+    let opts = &[
         getopts::opt("i",
                      "input",
                      "markdown file for input",
@@ -79,7 +79,7 @@ fn opts() -> Option<getopts::Matches> {
 }
 
 fn read_markdown_file(file: File) {
-    let blocks = preprocessor::replace_tabs(lines::split_file_lines(file));
+    let blocks = preprocessor::replace_tabs(&lines::split_file_lines(file));
     let markdown = convert::parse_block(&blocks);
     let html = markdown.to_html();
     println!("{}", html);

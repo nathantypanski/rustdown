@@ -104,7 +104,7 @@ mod tests {
             Some(heading) => {
                 assert_eq!(format!("{}", heading.to_html()), result.to_string());
             }
-            None => { fail!("Didn't count as a heading") }
+            None => { panic!("Didn't count as a heading") }
         }
     }
 

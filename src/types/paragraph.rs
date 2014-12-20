@@ -35,8 +35,8 @@ pub fn parse_paragraph(block: &Vec<String>) -> Paragraph {
             "".to_string(),
             |res, line| {
                 res
-                    + "\n".to_string()
-                    + line.as_slice().to_string()
+                    + "\n"
+                    + line.as_slice()
             }
         ).as_slice().trim().to_string()
     )

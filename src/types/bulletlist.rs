@@ -196,8 +196,8 @@ mod tests {
     #[test]
     fn test_nested_bullets() {
         let mut bullets = BulletList::new_unordered();
-        bullets.push(Lone(Bullet::new("Hello".to_string())));
-        bullets.push(Lone(Bullet::new("World".to_string())));
+        bullets.push(BulletElement::Lone(Bullet::new("Hello".to_string())));
+        bullets.push(BulletElement::Lone(Bullet::new("World".to_string())));
         assert_eq!(format!("{}", bullets.to_html()),
                    "<ul><li>Hello</li><li>World</li></ul>".to_string());
     }
@@ -207,8 +207,8 @@ mod tests {
         let s = vec!["- One".to_string(), "- Two".to_string()];
         let parsed = parse_bulletlist(&s);
         let mut bullets = BulletList::new_unordered();
-        bullets.push(Lone(Bullet::new("One".to_string())));
-        bullets.push(Lone(Bullet::new("Two".to_string())));
+        bullets.push(BulletElement::Lone(Bullet::new("One".to_string())));
+        bullets.push(BulletElement::Lone(Bullet::new("Two".to_string())));
         assert_eq!(parsed.unwrap(), bullets);
     }
 }
