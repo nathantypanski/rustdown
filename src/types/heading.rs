@@ -15,7 +15,7 @@ use text;
 
 macro_rules! parse (
     ($e:expr) => (match $e { Some(e) => return Some(e), None => () })
-)
+);
 
 /// A markdown text heading. `depth` signifies the level of the heading, e.g.,
 /// `# head` is depth 1, `## head` is depth 2, and so on.
