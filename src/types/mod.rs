@@ -36,9 +36,9 @@ impl MarkdownStructure {
 impl ToHtml for MarkdownStructure {
     fn to_html(&self) -> Html {
         match self {
-            &MDH(ref heading) => heading.to_html().clone(),
-            &MDP(ref paragraph) => paragraph.to_html().clone(),
-            &MDB(ref bulletlist) => bulletlist.to_html().clone(),
+            &MarkdownStructure::MDH(ref heading) => heading.to_html().clone(),
+            &MarkdownStructure::MDP(ref paragraph) => paragraph.to_html().clone(),
+            &MarkdownStructure::MDB(ref bulletlist) => bulletlist.to_html().clone(),
         }
     }
 }

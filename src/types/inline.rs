@@ -20,7 +20,7 @@ enum Contents {
 
 impl Contents {
     fn new(s: String) -> Contents {
-        Normal(s, box Nil)
+        Contents::Normal(s, box Contents::Nil)
     }
 }
 

@@ -82,7 +82,7 @@ impl Html {
     pub fn new_simple(name: String, contents: String) -> Html {
         Html {
             name: name,
-            contents: Some(vec![Bare(contents)]),
+            contents: Some(vec![HtmlContents::Bare(contents)]),
             attributes: vec![],
         }
     }
@@ -92,10 +92,10 @@ impl Html {
     pub fn add_tag(&mut self, tag: Html) {
         match self.contents {
             Some(ref mut contents) => {
-                contents.push(Tag(tag));
+                contents.push(HtmlContents::Tag(tag));
             },
             None => {
-                self.contents = Some(vec![Tag(tag)]);
+                self.contents = Some(vec![HtmlContents::Tag(tag)]);
             }
         }
     }
@@ -105,10 +105,10 @@ impl Html {
     pub fn add_string(&mut self, s: String) {
         match self.contents {
             Some(ref mut contents) => {
-                contents.push(Bare(s));
+                contents.push(HtmlContents::Bare(s));
             },
             None => {
-                self.contents = Some(vec![Bare(s)]);
+                self.contents = Some(vec![HtmlContents::Bare(s)]);
             }
         }
     }
@@ -137,11 +137,11 @@ impl fmt::Show for Html {
                 write!(fmt, ">");
                 for elem in contents.iter() {
                     match elem {
-                        &Tag(ref html) => {
+                        &HtmlContents::Tag(ref html) => {
                             // Multiple nested HTML elements.
                             write!(fmt, "{}", html);
                         }
-                        &Bare(ref s) => {
+                        &HtmlContents::Bare(ref s) => {
                             write!(fmt, "{}", Escape(s.as_slice()));
                         }
                     }

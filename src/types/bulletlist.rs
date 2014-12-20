@@ -27,8 +27,8 @@ impl BulletElement {}
 impl ToHtml for BulletElement {
     fn to_html(&self) -> Html {
         match self {
-            &Nested(ref bullet_list) => bullet_list.to_html(),
-            &Lone(ref bullet) => bullet.to_html(),
+            &BulletElement::Nested(ref bullet_list) => bullet_list.to_html(),
+            &BulletElement::Lone(ref bullet) => bullet.to_html(),
         }
     }
 }
@@ -107,7 +107,7 @@ impl BulletList {
     /// Add a string bullet to this list, with depth same as
     /// this list.
     fn push_string(&mut self, s: String) {
-        self.push(Lone(Bullet::new(s)))
+        self.push(BulletElement::Lone(Bullet::new(s)))
     }
 
     fn is_numeric_bullet<'a>(s: String) -> Option<(String, uint)> {

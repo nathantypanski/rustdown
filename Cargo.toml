@@ -3,3 +3,5 @@
 name = "rustdown"
 version = "0.0.1"
 authors = ["Nathan Typanski <ntypanski@gmail.com>"]
+
+[dependencies.url]

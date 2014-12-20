@@ -50,14 +50,14 @@ fn opts() -> Option<getopts::Matches> {
                      "input",
                      "markdown file for input",
                      "INPUT",
-                     getopts::Yes,
-                     getopts::Req),
+                     getopts::HasArg::Yes,
+                     getopts::Occur::Req),
         getopts::opt("o",
                      "output",
                      "set output file name",
                      "OUTPUT",
-                     getopts::Yes,
-                     getopts::Optional),
+                     getopts::HasArg::Yes,
+                     getopts::Occur::Optional),
         getopts::optflag("p",
                          "preview",
                          "preview the output in a web browser"),
@@ -79,7 +79,7 @@ fn opts() -> Option<getopts::Matches> {
 }
 
 fn read_markdown_file(file: File) {
-    let blocks = lines::split_file_lines(file);
+    let blocks = preprocessor::replace_tabs(lines::split_file_lines(file));
     let markdown = convert::parse_block(&blocks);
     let html = markdown.to_html();
     println!("{}", html);

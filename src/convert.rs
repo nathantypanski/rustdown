@@ -8,9 +8,7 @@
 // except according to those terms.
 
 use types::MarkdownStructure;
-use types::MDH;
-use types::MDP;
-use types::MDB;
+use types::MarkdownStructure::{MDH, MDP, MDB};
 use types::parse_heading;
 use types::parse_paragraph;
 use types::parse_bulletlist;
