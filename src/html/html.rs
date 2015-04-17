@@ -8,8 +8,6 @@
 // except according to those terms.
 
 use std::fmt;
-use std::slice::Items;
-use std::iter::Iterator;
 
 use rustdoc::html::escape::Escape;
 
@@ -17,7 +15,7 @@ use super::HtmlAttribute;
 
 /// The contents of an HTML tag.
 ///
-#[deriving(Clone)]
+#[derive(Clone)]
 pub enum HtmlContents {
     /// Just a string. For example, in
     ///
@@ -45,7 +43,7 @@ pub enum HtmlContents {
 ///
 /// These can have attributes, as well as nested contents.
 ///
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct Html {
     name: String,
     contents: Option<Vec<HtmlContents>>,
@@ -115,7 +113,7 @@ impl Html {
 
     pub fn slice_contents<'a>(&'a self) -> Option<&'a [HtmlContents]> {
         match self.contents {
-            Some(ref contents) => Some(contents.as_slice()),
+            Some(ref contents) => Some(contents),
             None => None,
         }
     }
@@ -125,32 +123,32 @@ pub trait ToHtml {
     fn to_html(&self) -> Html;
 }
 
-impl fmt::Show for Html {
+impl fmt::Display for Html {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        let name = Escape(self.name.as_slice());
-        write!(fmt, "<{}", name);
+        let name = Escape(&self.name);
+        try!(write!(fmt, "<{}", name));
         for attr in self.attributes.iter() {
-            write!(fmt, " {}", attr);
+            try!(write!(fmt, " {}", attr))
         }
         match self.slice_contents() {
             Some(contents) => {
-                write!(fmt, ">");
+                try!(write!(fmt, ">"));
                 for elem in contents.iter() {
                     match elem {
                         &HtmlContents::Tag(ref html) => {
                             // Multiple nested HTML elements.
-                            write!(fmt, "{}", html);
+                            try!(write!(fmt, "{}", html))
                         }
                         &HtmlContents::Bare(ref s) => {
-                            write!(fmt, "{}", Escape(s.as_slice()));
+                            try!(write!(fmt, "{}", Escape(s)))
                         }
                     }
                 };
-                write!(fmt, "</{}>", name);
+                try!(write!(fmt, "</{}>", name))
             }
             None => {
                 // Nothing! Close the tag.
-                write!(fmt, " />");
+                try!(write!(fmt, " />"))
             }
         }
         Ok(())

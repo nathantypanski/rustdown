@@ -7,19 +7,16 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-#![feature(macro_rules)]
-#![feature(phase)]
-#![feature(globs)]
-#![feature(import_shadowing)]
+#![feature(rustdoc)]
 
 extern crate rustdoc;
 extern crate getopts;
 extern crate url;
 
-use std::os;
-use std::path::posix::Path;
-use std::io::fs::File;
-use getopts::OptGroup;
+use std::env;
+use std::path::Path;
+use std::fs::File;
+use getopts::Options;
 
 use html::ToHtml;
 
@@ -32,47 +29,46 @@ pub mod types;
 pub mod convert;
 
 
-fn print_usage(program: &str, opts: &[OptGroup]) {
-    let summary = getopts::short_usage(program, opts);
-    let usage = getopts::usage(summary.as_slice(), opts);
+fn print_usage(program: &str, opts: Options) {
+    let summary = opts.short_usage(program);
+    let usage = opts.usage(&summary);
     println!("{}", usage);
 }
 
 // Get the options.
 // Print help if necessary, otherwise return Some(matches).
 fn opts() -> Option<getopts::Matches> {
-    let args: Vec<String> = os::args();
+    let args: Vec<String> = env::args().skip(1).collect();
 
     let program = "rustdown";
 
-    let opts = &[
-        getopts::opt("i",
-                     "input",
-                     "markdown file for input",
-                     "INPUT",
-                     getopts::HasArg::Yes,
-                     getopts::Occur::Req),
-        getopts::opt("o",
-                     "output",
-                     "set output file name",
-                     "OUTPUT",
-                     getopts::HasArg::Yes,
-                     getopts::Occur::Optional),
-        getopts::optflag("p",
-                         "preview",
-                         "preview the output in a web browser"),
-        getopts::optflag("h", "help", "print this help menu")
-    ];
-    let matches = match getopts::getopts(args.tail(), opts) {
+    let mut opts = Options::new();
+    opts.opt("i",
+             "input",
+             "markdown file for input",
+             "INPUT",
+             getopts::HasArg::Yes,
+             getopts::Occur::Req);
+    opts.opt("o",
+             "output",
+             "set output file name",
+             "OUTPUT",
+             getopts::HasArg::Yes,
+             getopts::Occur::Optional);
+    opts.optflag("p",
+                 "preview",
+                 "preview the output in a web browser");
+    opts.optflag("h", "help", "print this help menu");
+    let matches = match opts.parse(args) {
         Ok(m) => { m }
         Err(f) => {
             println!("{}\n", f.to_string());
-            print_usage(program.as_slice(), opts);
+            print_usage(&program, opts);
             return None;
         }
     };
     if matches.opt_present("h") {
-        print_usage(program.as_slice(), opts);
+        print_usage(&program, opts);
         return None;
     }
     return Some(matches);
@@ -91,10 +87,7 @@ fn main() {
     match opts() {
         Some(matches) => {
             let input = matches.opt_str("i").expect("Some input argument is required!");
-            let input_file = match Path::new_opt(input) {
-                Some(file) => file,
-                None => return,
-            };
+            let input_file = Path::new(&input);
             match mdfile::open_markdown_file(&input_file) {
                 Ok(file) => {
                     read_markdown_file(file);

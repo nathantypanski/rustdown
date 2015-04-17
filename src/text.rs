@@ -7,17 +7,15 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::str::CharEq;
-use std::fmt::Show;
 
 
 /// If string `s` starts with `c`, then return the remaining characters
 /// after `c` has been trimmed from the beginning, along with the number
 /// of occurrences of `c` in the beginning of string `s`.
-pub fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
+pub fn starting_chars(s: &str, c: char) -> Option<(String, u32)> {
     let mut result = None;
-    if s.trim_chars(c) != s {
-        let mut count = 0u;
+    if s.trim_matches(c) != s {
+        let mut count = 0u32;
         let mut found = false;
         let words: String = s.chars().filter_map(
             |letter| {
@@ -31,22 +29,13 @@ pub fn starting_chars(s: &str, c: char) -> Option<(String, uint)> {
                 }
             }
         ).collect();
-        result = Some((words.as_slice().trim_left_chars(' ').to_string(), count));
+        result = Some((words.trim_left_matches(' ').to_string(), count));
     }
     return result;
 }
 
 pub fn all_chars_are(c: char, s: &str) -> bool {
-    let cs = c.to_string();
-    let ch = cs.as_slice();
-    if s.starts_with(ch) {
-        for badchar in s.as_slice().chars().filter_map(
-                    |e| if e == c { None } else { Some(c) }) {
-            return false;
-        }
-        return true;
-    }
-    false
+    !s.is_empty() && s.chars().all(|x| x == c)
 }
 
 #[cfg(test)]

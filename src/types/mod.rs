@@ -22,7 +22,7 @@ pub mod heading;
 pub mod paragraph;
 pub mod bulletlist;
 
-#[deriving(Show)]
+#[derive(Debug)]
 pub enum MarkdownStructure {
     MDH(Heading),
     MDP(Paragraph),

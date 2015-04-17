@@ -20,14 +20,14 @@ macro_rules! parse (
 /// A markdown text heading. `depth` signifies the level of the heading, e.g.,
 /// `# head` is depth 1, `## head` is depth 2, and so on.
 ///
-#[deriving(Show)]
+#[derive(Debug)]
 pub struct Heading {
     contents: String,
-    depth: uint,
+    depth: u32,
 }
 
 impl Heading {
-    pub fn new(title: String, depth: uint) -> Heading {
+    pub fn new(title: String, depth: u32) -> Heading {
         Heading {
             contents: title,
             depth: depth,
@@ -67,7 +67,7 @@ pub fn parse_heading(block: &Vec<String>) -> Option<Heading> {
 ///
 fn pound_heading(b: &Vec<String>) -> Option<Heading> {
     if b.len() != 1 { return None }
-    let s = b[0].as_slice();
+    let s = &b[0];
     match text::starting_chars(s, '#') {
         Some((title, count)) => Some(Heading::new(title.to_string(), count)),
         None => None,
@@ -81,11 +81,11 @@ fn pound_heading(b: &Vec<String>) -> Option<Heading> {
 ///
 fn line_heading(b: &Vec<String>) -> Option<Heading> {
     if b.len() != 2 { return None }
-    let mut depth = 0u;
-    if text::all_chars_are('=', b[1].as_slice()) {
+    let mut depth = 0usize;
+    if text::all_chars_are('=', &b[1]) {
         return Some(Heading::new(b[0].to_string(), 1));
     }
-    if text::all_chars_are('-', b[1].as_slice()) {
+    if text::all_chars_are('-', &b[1]) {
         return Some(Heading::new(b[0].to_string(), 2));
     }
     return None;

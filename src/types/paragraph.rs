@@ -10,7 +10,7 @@
 use html::ToHtml;
 use html::Html;
 
-#[deriving(Show)]
+#[derive(Debug)]
 pub struct Paragraph {
     contents: String,
 }
@@ -33,12 +33,8 @@ pub fn parse_paragraph(block: &Vec<String>) -> Paragraph {
     Paragraph::new(
         block.iter().fold(
             "".to_string(),
-            |res, line| {
-                res
-                    + "\n"
-                    + line.as_slice()
-            }
-        ).as_slice().trim().to_string()
+            |res, line| res + "\n" + line
+        ).trim().to_string()
     )
 }
 

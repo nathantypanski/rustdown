@@ -16,7 +16,7 @@ use text;
 /// *Nested* means there's a sublist,
 /// while *Lone* means this is just a list item.
 ///
-#[deriving(Eq, PartialEq, Clone, Show)]
+#[derive(Eq, PartialEq, Clone, Debug)]
 pub enum BulletElement {
     Nested(BulletList),
     Lone(Bullet),
@@ -40,7 +40,7 @@ impl ToHtml for BulletElement {
 ///
 /// The only valid tag for normal HTML would be `li`.
 ///
-#[deriving(Eq, PartialEq, Clone, Show)]
+#[derive(Eq, PartialEq, Clone, Debug)]
 pub struct Bullet {
     contents: String,
     tag: String,
@@ -76,7 +76,7 @@ impl ToHtml for Bullet {
 /// - But this second bullet makes it a bulleted list.
 ///     - They can have somewhat arbitrary depth.
 ///
-#[deriving(Eq, PartialEq, Clone, Show)]
+#[derive(Eq, PartialEq, Clone, Debug)]
 pub struct BulletList {
     contents: Vec<BulletElement>,
     tag: String,
@@ -110,8 +110,8 @@ impl BulletList {
         self.push(BulletElement::Lone(Bullet::new(s)))
     }
 
-    fn is_numeric_bullet<'a>(s: String) -> Option<(String, uint)> {
-        text::starting_chars(s.as_slice(), ' ')
+    fn is_numeric_bullet<'a>(s: String) -> Option<(String, u32)> {
+        text::starting_chars(&s, ' ')
         .and_then(|(s, i)| {
             if i % 4 == 0 {
                 Some((s, i))
@@ -137,46 +137,32 @@ impl ToHtml for BulletList {
 
 pub fn parse_bulletlist(b: &Vec<String>) -> Option<BulletList> {
     // TODO: Doesn't support nested lists!
-    let mut c: &str = "";
+    let mut c: Option<&str> = None;
+    let mut bullets = BulletList::new_unordered();
     for s in b.iter() {
-        let st = s.as_slice().trim_left();
-        if st.len() < 1 { continue }
-        // TODO: This match is ugly.
-        match st.slice_chars(0, 1) {
-            "-" => {
+        let st = s.trim_left();
+        if st.is_empty() { continue }
+        match &st.as_bytes()[..1] {
+            b"-" => {
                 match c {
-                    "" => {
-                        c = "-";
-                    }
-                    bullet_letter => {
-                        if bullet_letter != "-" {
-                            return None;
-                        }
-                    }
+                    None => c = Some("-"),
+                    Some("-") => (),
+                    _ => return None
                 }
+                let s = st[1..].trim_left().to_string();
+                bullets.push_string(s)
             }
-            "*" => {
+            b"*" => {
                 match c {
-                    "" => {
-                        c = "*";
-                    }
-                    bullet_letter => {
-                        if bullet_letter != "*" {
-                            return None;
-                        }
-                    }
+                    None => c = Some("-"),
+                    Some("-") => (),
+                    _ => return None
                 }
+                let s = st[1..].trim_left().to_string();
+                bullets.push_string(s)
             }
             _ => return None,
         }
-    }
-    let mut bullets = BulletList::new_unordered();
-    for s in b.iter() {
-        bullets.push_string(s
-                            .as_slice()
-                            .slice_from(1u)
-                            .trim_left()
-                            .to_string());
     }
     Some(bullets)
 }
@@ -209,6 +195,6 @@ mod tests {
         let mut bullets = BulletList::new_unordered();
         bullets.push(BulletElement::Lone(Bullet::new("One".to_string())));
         bullets.push(BulletElement::Lone(Bullet::new("Two".to_string())));
-        assert_eq!(parsed.unwrap(), bullets);
+        assert_eq!(parsed, Some(bullets));
     }
 }

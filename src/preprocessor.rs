@@ -10,7 +10,7 @@
 use std::str;
 
 pub fn replace_tabs(lines: &Vec<String>) -> Vec<String> {
-    lines.iter().map(|s| str::replace("\t", "    ", s.as_slice())).collect()
+    lines.iter().map(|s| str::replace("\t", "    ", s)).collect()
 }
 
 #[cfg(test)]

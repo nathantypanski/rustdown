@@ -7,10 +7,10 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use std::io::{IoResult, Open, Read};
-use std::io::fs::File;
-use std::path::posix::Path;
+use std::fs::File;
+use std::path::Path;
+use std::io::Result as IoResult;
 
 pub fn open_markdown_file(path: &Path) -> IoResult<File> {
-    File::open_mode(path, Open, Read)
+    File::open(path)
 }
